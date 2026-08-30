@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Open Live Scores</title>
+    <style>
+        /* ============================================
+               CSS - Complete Styling
+               ============================================ */
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --bg-card-hover: #1f2937;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.4);
+            --accent-secondary: #f59e0b;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border: #2d3748;
+            --live-red: #ef4444;
+            --live-green: #10b981;
+            --court-purple: #7c3aed;
+            --court-blue: #3b82f6;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ---- Background Pattern ---- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ---- Header ---- */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent), var(--court-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text span {
+            font-weight: 400;
+            opacity: 0.7;
+            font-size: 14px;
+            display: block;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--live-red);
+        }
+
+        .live-badge .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--live-red);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+            }
+            50% {
+                transform: scale(1.4);
+                opacity: 0.6;
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .refresh-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .refresh-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--accent);
+            transform: rotate(180deg);
+        }
+
+        .refresh-btn:active {
+            transform: rotate(360deg) scale(0.9);
+            transition: 0.1s;
+        }
+
+        /* ---- Main Container ---- */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* ---- Tournament Header ---- */
+        .tournament-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .tournament-title {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 30%, #93c5fd 70%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .tournament-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ---- Filters ---- */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 30px;
+            padding: 9px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--accent);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        /* ---- Match Cards ---- */
+        .matches-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .match-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease-out both;
+        }
+
+        .match-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .match-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: var(--radius) 0 0 var(--radius);
+        }
+
+        .match-card.live::before {
+            background: var(--live-red);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+        .match-card.completed::before {
+            background: var(--live-green);
+        }
+        .match-card.scheduled::before {
+            background: var(--accent);
+        }
+
+        .match-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .match-status {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .match-card.live .match-status {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--live-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .match-card.completed .match-status {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--live-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .match-card.scheduled .match-status {
+            background: rgba(37, 99, 235, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .match-court {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .match-court .court-icon {
+            margin-right: 4px;
+        }
+
+        .players-grid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .player.right {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .player-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bg-card-hover), #2d3748);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .match-card.live .player-avatar {
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .player-info {
+            min-width: 0;
+        }
+
+        .player-name {
+            font-weight: 700;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: var(--transition);
+        }
+
+        .player.right .player-name {
+            text-align: right;
+        }
+
+        .player-country {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .player-score {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            min-width: 60px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .match-card.live .player-score {
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .score-divider {
+            font-size: 20px;
+            color: var(--text-muted);
+            font-weight: 300;
+            flex-shrink: 0;
+        }
+
+        /* ---- Match Details (expanded) ---- */
+        .match-details {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .match-card.expanded .match-details {
+            display: block;
+        }
+
+        .set-scores {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 8px 20px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .set-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .set-row {
+            display: contents;
+        }
+
+        .set-score-left,
+        .set-score-right {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xs);
+            text-align: center;
+        }
+
+        .set-number {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .match-stats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .stat-chip {
+            background: var(--bg-secondary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* ---- Loading State ---- */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---- Empty State ---- */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* ---- Footer ---- */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* ---- Toast Notification ---- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Responsive Design ---- */
+        @media (max-width: 600px) {
+            .tournament-title {
+                font-size: 28px;
+                letter-spacing: -1px;
+            }
+            .tournament-subtitle {
+                font-size: 12px;
+                letter-spacing: 0.5px;
+            }
+            .match-card {
+                padding: 16px 18px;
+            }
+            .player-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .player-name {
+                font-size: 14px;
+            }
+            .player-score {
+                font-size: 24px;
+                min-width: 40px;
+            }
+            .players-grid {
+                gap: 10px;
+            }
+            .header {
+                padding: 0 16px;
+                height: 60px;
+            }
+            .logo-text {
+                font-size: 16px;
+            }
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+                border-radius: 10px;
+            }
+            .container {
+                padding: 20px 12px 40px;
+            }
+            .filters {
+                gap: 6px;
+            }
+            .filter-btn {
+                padding: 7px 14px;
+                font-size: 12px;
+            }
+            .set-score-left,
+            .set-score-right {
+                font-size: 13px;
+                padding: 4px 8px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .player-score {
+                font-size: 20px;
+            }
+            .player-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+                border-radius: 50%;
+            }
+            .player-name {
+                font-size: 12px;
+            }
+            .match-status-row {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    HEADER
+    ============================================ -->
+    <header class="header" id="header">
+        <a class="logo" href="#">
+            <div class="logo-icon">US</div>
+            <div class="logo-text">
+                US Open Scores
+                <span>Live Tennis Center</span>
+            </div>
+        </a>
+        <div class="header-right">
+            <div class="live-badge" id="liveBadge">
+                <span class="pulse-dot"></span>
+                <span id="liveCount">0</span> LIVE
+            </div>
+            <button class="refresh-btn" id="refreshBtn" title="Refresh Scores" aria-label="Refresh scores">
+                ⟳
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
+    <main class="container">
+        <!-- Tournament Header -->
+        <div class="tournament-header">
+            <h1 class="tournament-title">US Open</h1>
+            <p class="tournament-subtitle">Flushing Meadows · New York</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all">All Matches</button>
+            <button class="filter-btn" data-filter="live">🔴 Live</button>
+            <button class="filter-btn" data-filter="completed">✅ Completed</button>
+            <button class="filter-btn" data-filter="scheduled">📅 Scheduled</button>
+        </div>
+
+        <!-- Matches Container -->
+        <div class="matches-container" id="matchesContainer">
+            <!-- Dynamic content injected by JavaScript -->
+            <div class="loading" id="loadingState">
+                <div class="spinner"></div>
+                <p class="loading-text">Fetching live scores...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Data updates automatically · Built with ❤️ for tennis fans · <a href="https://github.com" target="_blank" rel="noopener">Host for free on GitHub Pages</a></p>
+        </footer>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================
+    JAVASCRIPT - Complete Functionality
+    ============================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================
+            // CONFIGURATION
+            // ============================================
+
+            /**
+             * 🎾 FREE API OPTIONS:
+             *
+             * Option 1: TheSportsDB (no signup needed, test key "3" works)
+             *   - Endpoint: https://www.thesportsdb.com/api/v1/json/3/eventsnextleague.php?id=4470
+             *   - Free and open, no registration required
+             *
+             * Option 2: API-Sports (free tier, 100 requests/day)
+             *   - Sign up at https://api-sports.io for a free API key
+             *   - Endpoint: https://v1.tennis.api-sports.io/games?league=156&season=2024
+             *   - Requires header: "x-apisports-key: YOUR_KEY"
+             *
+             * Option 3: Use your own API or a CORS proxy
+             *
+             * For this demo, we use TheSportsDB with a public test key.
+             * You can easily replace the fetch function below with any API.
+             */
+
+            const CONFIG = {
+                // ---- API Settings ----
+                API_BASE_URL: 'https://www.thesportsdb.com/api/v1/json/3',
+                API_KEY: '3', // free test key from TheSportsDB
+                LEAGUE_ID: '4470', // ATP Tennis league ID on TheSportsDB
+
+                // ---- Refresh Settings ----
+                AUTO_REFRESH_INTERVAL: 30000, // 30 seconds (in ms)
+
+                // ---- Fallback/Demo Data (shown if API fails) ----
+                USE_DEMO_DATA_ON_ERROR: true,
+            };
+
+            // ============================================
+            // DEMO DATA (Fallback when API is unavailable)
+            // ============================================
+            const DEMO_MATCHES = [{
+                id: 'demo-1',
+                status: 'live',
+                court: 'Arthur Ashe Stadium',
+                player1: { name: 'Carlos Alcaraz', country: 'ESP', initials: 'CA' },
+                player2: { name: 'Novak Djokovic', country: 'SRB', initials: 'ND' },
+                score1: 2,
+                score2: 1,
+                sets: [
+                    { p1: 6, p2: 4 },
+                    { p1: 4, p2: 6 },
+                    { p1: 6, p2: 3 },
+                    { p1: 4, p2: 4 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 4,
+                stats: ['Aces: 8-6', 'Double Faults: 2-3', 'Break Points: 3/5 - 2/7'],
+                startTime: '2:15 PM',
+            }, {
+                id: 'demo-2',
+                status: 'live',
+                court: 'Louis Armstrong Stadium',
+                player1: { name: 'Iga Świątek', country: 'POL', initials: 'IS' },
+                player2: { name: 'Coco Gauff', country: 'USA', initials: 'CG' },
+                score1: 1,
+                score2: 1,
+                sets: [
+                    { p1: 7, p2: 5 },
+                    { p1: 3, p2: 6 },
+                    { p1: 5, p2: 5 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 3,
+                stats: ['Aces: 5-7', 'Double Faults: 1-2', 'Break Points: 4/8 - 3/6'],
+                startTime: '12:00 PM',
+            }, {
+                id: 'demo-3',
+                status: 'completed',
+                court: 'Arthur Ashe Stadium',
+                player1: { name: 'Jannik Sinner', country: 'ITA', initials: 'JS' },
+                player2: { name: 'Daniil Medvedev', country: 'RUS', initials: 'DM' },
+                score1: 3,
+                score2: 0,
+                sets: [
+                    { p1: 6, p2: 3 },
+                    { p1: 6, p2: 4 },
+                    { p1: 7, p2: 5 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 3,
+                stats: ['Aces: 12-9', 'Double Faults: 3-4', 'Break Points: 5/9 - 2/5'],
+                startTime: '10:00 AM',
+            }, {
+                id: 'demo-4',
+                status: 'completed',
+                court: 'Grandstand',
+                player1: { name: 'Aryna Sabalenka', country: 'BLR', initials: 'AS' },
+                player2: { name: 'Elena Rybakina', country: 'KAZ', initials: 'ER' },
+                score1: 2,
+                score2: 1,
+                sets: [
+                    { p1: 6, p2: 4 },
+                    { p1: 4, p2: 6 },
+                    { p1: 6, p2: 2 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 3,
+                stats: ['Aces: 9-11', 'Double Faults: 5-3', 'Break Points: 4/7 - 3/8'],
+                startTime: '9:30 AM',
+            }, {
+                id: 'demo-5',
+                status: 'scheduled',
+                court: 'Court 17',
+                player1: { name: 'Taylor Fritz', country: 'USA', initials: 'TF' },
+                player2: { name: 'Alexander Zverev', country: 'GER', initials: 'AZ' },
+                score1: 0,
+                score2: 0,
+                sets: [
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 0,
+                stats: [],
+                startTime: '4:30 PM',
+            }, {
+                id: 'demo-6',
+                status: 'scheduled',
+                court: 'Arthur Ashe Stadium',
+                player1: { name: 'Ons Jabeur', country: 'TUN', initials: 'OJ' },
+                player2: { name: 'Jessica Pegula', country: 'USA', initials: 'JP' },
+                score1: 0,
+                score2: 0,
+                sets: [
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                    { p1: 0, p2: 0 },
+                ],
+                currentSet: 0,
+                stats: [],
+                startTime: '7:00 PM',
+            }, ];
+
+            // ============================================
+            // STATE
+            // ============================================
+            let matches = [];
+            let currentFilter = 'all';
+            let isAutoRefreshing = true;
+            let autoRefreshTimer = null;
+            let isLoading = false;
+
+            // ============================================
+            // DOM REFERENCES
+            // ============================================
+            const matchesContainer = document.getElementById('matchesContainer');
+            const loadingState = document.getElementById('loadingState');
+            const liveBadge = document.getElementById('liveBadge');
+            const liveCountEl = document.getElementById('liveCount');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const header = document.getElementById('header');
+            const toast = document.getElementById('toast');
+
+            // ============================================
+            // UTILITY FUNCTIONS
+            // ============================================
+            function showToast(message, duration = 2500) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            function formatTime(dateStr) {
+                if (!dateStr) return '—';
+                try {
+                    const d = new Date(dateStr);
+                    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                } catch {
+                    return '—';
+                }
+            }
+
+            function getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+            }
+
+            function getCountryFlagEmoji(countryCode) {
+                const flags = {
+                    'ESP': '🇪🇸',
+                    'SRB': '🇷🇸',
+                    'POL': '🇵🇱',
+                    'USA': '🇺🇸',
+                    'ITA': '🇮🇹',
+                    'RUS': '🇷🇺',
+                    'BLR': '🇧🇾',
+                    'KAZ': '🇰🇿',
+                    'GER': '🇩🇪',
+                    'TUN': '🇹🇳',
+                    'FRA': '🇫🇷',
+                    'GBR': '🇬🇧',
+                    'AUS': '🇦🇺',
+                    'CAN': '🇨🇦',
+                    'BRA': '🇧🇷',
+                    'ARG': '🇦🇷',
+                    'CZE': '🇨🇿',
+                    'GRE': '🇬🇷',
+                    'NOR': '🇳🇴',
+                };
+                return flags[countryCode] || '🌍';
+            }
+
+            // ============================================
+            // API FETCH FUNCTION
+            // ============================================
+
+            /**
+             * Fetches live tennis scores from TheSportsDB free API.
+             * Replace this function entirely to use a different API.
+             */
+            async function fetchMatchesFromAPI() {
+                const url =
+                    `${CONFIG.API_BASE_URL}/eventsnextleague.php?id=${CONFIG.LEAGUE_ID}&apiKey=${CONFIG.API_KEY}`;
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API responded with status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.events || data.events.length === 0) {
+                    return []; // No events available
+                }
+
+                // Transform API data to our match format
+                return data.events.map(event => {
+                    const status = event.strStatus === 'Match Finished' ? 'completed' :
+                        event.strStatus === 'In Play' || event.strStatus === 'Live' ? 'live' :
+                        'scheduled';
+
+                    const scoreParts = (event.strScore || '').split(' - ');
+                    const score1 = parseInt(scoreParts[0]) || 0;
+                    const score2 = parseInt(scoreParts[1]) || 0;
+
+                    return {
+                        id: event.idEvent,
+                        status: status,
+                        court: event.strVenue || 'Court TBD',
+                        player1: {
+                            name: event.strHomeTeam || 'Player 1',
+                            country: event.strHomeTeamBadge || '—',
+                            initials: getInitials(event.strHomeTeam || 'Player 1'),
+                        },
+                        player2: {
+                            name: event.strAwayTeam || 'Player 2',
+                            country: event.strAwayTeamBadge || '—',
+                            initials: getInitials(event.strAwayTeam || 'Player 2'),
+                        },
+                        score1: score1,
+                        score2: score2,
+                        sets: [], // Detailed set scores not available from TheSportsDB free tier
+                        currentSet: 0,
+                        stats: [],
+                        startTime: event.strTimestamp ? formatTime(event.strTimestamp) :
+                            formatTime(event.strTime),
+                    };
+                });
+            }
+
+            // ============================================
+            // LOAD MATCHES (with fallback)
+            // ============================================
+            async function loadMatches(showLoading = true) {
+                if (isLoading) return;
+                isLoading = true;
+
+                if (showLoading && matches.length === 0) {
+                    matchesContainer.innerHTML = `
+                            <div class="loading" id="loadingState">
+                                <div class="spinner"></div>
+                                <p class="loading-text">Fetching live scores...</p>
+                            </div>
+                        `;
+                }
+
+                try {
+                    const apiMatches = await fetchMatchesFromAPI();
+
+                    if (apiMatches.length > 0) {
+                        matches = apiMatches;
+                        showToast('✅ Scores updated successfully');
+                    } else if (CONFIG.USE_DEMO_DATA_ON_ERROR) {
+                        // Use demo data as fallback
+                        matches = DEMO_MATCHES;
+                        showToast('📡 Using demo data (no live matches available)');
+                    } else {
+                        matches = [];
+                        showToast('❌ No matches found');
+                    }
+                } catch (error) {
+                    console.warn('API fetch failed, using demo data:', error.message);
+                    if (CONFIG.USE_DEMO_DATA_ON_ERROR) {
+                        matches = DEMO_MATCHES;
+                        showToast('📡 API unavailable — showing demo data');
+                    } else {
+                        matches = [];
+                        showToast('❌ Failed to load scores. Try again.');
+                    }
+                }
+
+                isLoading = false;
+                renderMatches();
+            }
+
+            // ============================================
+            // RENDER MATCHES
+            // ============================================
+            function renderMatches() {
+                // Update live count
+                const liveCount = matches.filter(m => m.status === 'live').length;
+                liveCountEl.textContent = liveCount;
+                liveBadge.style.display = liveCount > 0 ? 'flex' : 'none';
+
+                // Apply filter
+                let filteredMatches = matches;
+                if (currentFilter === 'live') {
+                    filteredMatches = matches.filter(m => m.status === 'live');
+                } else if (currentFilter === 'completed') {
+                    filteredMatches = matches.filter(m => m.status === 'completed');
+                } else if (currentFilter === 'scheduled') {
+                    filteredMatches = matches.filter(m => m.status === 'scheduled');
+                }
+
+                if (filteredMatches.length === 0) {
+                    matchesContainer.innerHTML = `
+                            <div class="empty-state">
+                                <div class="emoji">🎾</div>
+                                <h3>No matches found</h3>
+                                <p>Try a different filter or check back soon.</p>
+                            </div>
+                        `;
+                    return;
+                }
+
+                // Sort: live first, then scheduled by time, then completed
+                const statusOrder = { live: 0, scheduled: 1, completed: 2 };
+                filteredMatches.sort((a, b) => {
+                    if (statusOrder[a.status] !== statusOrder[b.status]) {
+                        return statusOrder[a.status] - statusOrder[b.status];
+                    }
+                    return 0;
+                });
+
+                // Build HTML
+                matchesContainer.innerHTML = filteredMatches.map((match, index) => {
+                    const isLive = match.status === 'live';
+                    const isCompleted = match.status === 'completed';
+                    const statusLabel = isLive ? '🔴 Live' :
+                        isCompleted ? '✅ Completed' : '📅 Scheduled';
+
+                    const country1 = match.player1.country !== '—' ?
+                        getCountryFlagEmoji(match.player1.country) : '';
+                    const country2 = match.player2.country !== '—' ?
+                        getCountryFlagEmoji(match.player2.country) : '';
+
+                    // Build set scores if available
+                    let setScoresHtml = '';
+                    if (match.sets && match.sets.length > 0) {
+                        const setNumbers = match.sets.map((_, i) =>
+                            `<span class="set-number">Set ${i + 1}</span>`
+                        ).join('');
+
+                        const setScoresLeft = match.sets.map(s =>
+                            `<span class="set-score-left">${s.p1}</span>`
+                        ).join('');
+
+                        const setScoresRight = match.sets.map(s =>
+                            `<span class="set-score-right">${s.p2}</span>`
+                        ).join('');
+
+                        setScoresHtml = `
+                                <div class="set-scores">
+                                    <div class="set-header">${match.player1.name.split(' ')[0]}</div>
+                                    <div></div>
+                                    <div class="set-header">${match.player2.name.split(' ')[0]}</div>
+                                    <div class="set-row">
+                                        ${setScoresLeft}
+                                        ${setNumbers}
+                                        ${setScoresRight}
+                                    </div>
+                                </div>
+                            `;
+                    }
+
+                    const statsHtml = match.stats && match.stats.length > 0 ?
+                        `<div class="match-stats">
+                                ${match.stats.map(s => `<span class="stat-chip">${s}</span>`).join('')}
+                            </div>` : '';
+
+                    return `
+                            <div class="match-card ${match.status}" data-match-id="${match.id}" data-status="${match.status}" style="animation-delay: ${index * 0.06}s">
+                                <div class="match-status-row">
+                                    <span class="match-status">${statusLabel}</span>
+                                    <span class="match-court">
+                                        <span class="court-icon">📍</span> ${match.court}
+                                        ${match.startTime ? ` · ${match.startTime}` : ''}
+                                    </span>
+                                </div>
+                                <div class="players-grid">
+                                    <div class="player left">
+                                        <div class="player-avatar">${match.player1.initials}</div>
+                                        <div class="player-info">
+                                            <div class="player-name">${country1} ${match.player1.name}</div>
+                                            ${match.player1.country !== '—' ? `<div class="player-country">${match.player1.country}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="player-score">${match.score1}</div>
+                                    <div class="score-divider">:</div>
+                                    <div class="player-score">${match.score2}</div>
+                                    <div class="player right">
+                                        <div class="player-avatar">${match.player2.initials}</div>
+                                        <div class="player-info">
+                                            <div class="player-name">${country2} ${match.player2.name}</div>
+                                            ${match.player2.country !== '—' ? `<div class="player-country">${match.player2.country}</div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="match-details">
+                                    ${setScoresHtml}
+                                    ${statsHtml}
+                                </div>
+                            </div>
+                        `;
+                }).join('');
+
+                // Add click listeners to toggle expanded state
+                document.querySelectorAll('.match-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        card.classList.toggle('expanded');
+                    });
+                });
+            }
+
+            // ============================================
+            // FILTER HANDLING
+            // ============================================
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderMatches();
+                });
+            });
+
+            // ============================================
+            // REFRESH HANDLING
+            // ============================================
+            refreshBtn.addEventListener('click', () => {
+                loadMatches(false);
+                showToast('🔄 Refreshing scores...');
+            });
+
+            // ============================================
+            // AUTO-REFRESH
+            // ============================================
+            function startAutoRefresh() {
+                if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+                autoRefreshTimer = setInterval(() => {
+                    if (document.visibilityState === 'visible' && isAutoRefreshing) {
+                        loadMatches(false);
+                    }
+                }, CONFIG.AUTO_REFRESH_INTERVAL);
+            }
+
+            function stopAutoRefresh() {
+                if (autoRefreshTimer) {
+                    clearInterval(autoRefreshTimer);
+                    autoRefreshTimer = null;
+                }
+            }
+
+            // Handle visibility change to save battery/data
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    startAutoRefresh();
+                    loadMatches(false);
+                } else {
+                    stopAutoRefresh();
+                }
+            });
+
+            // ============================================
+            // HEADER SCROLL EFFECT
+            // ============================================
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // ============================================
+            // KEYBOARD SHORTCUTS
+            // ============================================
+            document.addEventListener('keydown', (e) => {
+                // Press 'R' to refresh
+                if (e.key === 'r' || e.key === 'R') {
+                    if (!e.target.matches('input, textarea, select')) {
+                        refreshBtn.click();
+                    }
+                }
+                // Press '1' for All, '2' for Live, '3' for Completed, '4' for Scheduled
+                const filterMap = { '1': 'all', '2': 'live', '3': 'completed', '4': 'scheduled' };
+                if (e.key in filterMap && !e.target.matches('input, textarea, select')) {
+                    const targetFilter = filterMap[e.key];
+                    filterBtns.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.filter === targetFilter);
+                    });
+                    currentFilter = targetFilter;
+                    renderMatches();
+                }
+            });
+
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+            function init() {
+                // Initial load
+                loadMatches(true);
+                // Start auto-refresh
+                startAutoRefresh();
+                // Log to console for developers
+                console.log('%c🎾 US Open Live Scores', 'font-size: 20px; font-weight: bold; color: #2563eb;');
+                console.log('%cAuto-refresh: every ' + (CONFIG.AUTO_REFRESH_INTERVAL / 1000) + ' seconds',
+                    'color: #9ca3af;');
+                console.log('%cPress "R" to refresh · Press 1-4 to filter', 'color: #9ca3af;');
+                console.log('%cAPI: TheSportsDB (free) · Swap in any API in the CONFIG', 'color: #9ca3af;');
+            }
+
+            // Start the app
+            init();
+
+        })();
+    </script>
+</body>
+</html>
