@@ -124,7 +124,7 @@
             <div id="ts247-widget-container">
                 
                 <h3 style="text-align:center; color:#aaa; margin-top:150px; font-weight: 400;">
-                    [ Paste the generated snippet here ]
+                    <div><?php $html = ""; $url = "https://www.tennisstats247.com/TournamentResultsRssWidget.aspx?langId=1&tournamentId=11941&matches=8";$xml = simplexml_load_file($url); $description = $xml->channel->item->description; $html .= "$description"; echo $html; ?></div>
                 </h3>
                 
                 </div>
