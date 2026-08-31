@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>US Open 2026 | Live Scores</title>
+    <title>US Open | Live Scores</title>
     <style>
         :root {
             --us-open-blue: #002244;
@@ -23,23 +23,23 @@
         .header {
             background-color: var(--us-open-blue);
             color: white;
-            padding: 30px 0;
+            padding: 28px 0;
             text-align: center;
-            border-bottom: 6px solid var(--us-open-yellow);
+            border-bottom: 5px solid var(--us-open-yellow);
         }
 
         .header h1 {
             margin: 0;
-            font-size: 36px;
+            font-size: 32px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         .header p {
-            margin: 10px 0 0 0;
+            margin: 8px 0 0 0;
             color: var(--us-open-yellow);
-            font-weight: bold;
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -47,8 +47,8 @@
 
         .status-dot {
             display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background-color: #ff3b30;
             border-radius: 50%;
             margin-right: 8px;
@@ -63,63 +63,72 @@
 
         .container {
             max-width: 950px;
-            margin: 40px auto;
-            padding: 0 20px;
+            margin: 35px auto;
+            padding: 0 15px;
         }
 
         .widget-wrapper {
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            min-height: 500px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            min-height: 480px;
         }
 
-        #score-container {
-            width: 100%;
-            min-height: 450px;
+        #powered-by {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        #powered-by-link {
+            color: #004d99;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        #powered-by-link:hover {
+            text-decoration: underline;
         }
 
         .footer {
             text-align: center;
-            padding: 30px 20px;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #ddd;
-            margin-top: 40px;
+            padding: 25px 20px 40px;
+            color: #777;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>US Open 2026</h1>
-        <p><span class="status-dot"></span>LIVE MATCH SCORES</p>
+        <h1>US Open</h1>
+        <p><span class="status-dot"></span>LIVE SCORES & MATCH TRACKER</p>
     </div>
 
     <div class="container">
         <div class="widget-wrapper">
-            <div id="score-container">
-                
-                <!-- ========================================== -->
-                <!-- <div data-widget-type="entityScores" data-entity-type="league" data-entity-id="230" data-lang="en" data-widget-id="ddf94157-4e67-407a-879c-2661ae17d391"></div>
-<div id="powered-by">Powered by<a id="powered-by-link" href="https://www.365scores.com" target="_blank">365Scores.com</a></div>
-<script src="https://widgets.365scores.com/main.js"></script>   -->
-                <!-- ========================================== -->
-                
-                
-
-                <!-- ========================================== -->
+            <!-- 365Scores Widget Container -->
+            <div 
+                data-widget-type="entityScores" 
+                data-entity-type="league" 
+                data-entity-id="230" 
+                data-lang="en" 
+                data-widget-id="ddf94157-4e67-407a-879c-2661ae17d391">
+            </div>
+            <div id="powered-by">
+                Powered by <a id="powered-by-link" href="https://www.365scores.com" target="_blank" rel="noopener noreferrer">365Scores.com</a>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        Data provided by 365Scores. Hosted via GitHub Pages.
+        Hosted via GitHub Pages
     </div>
 
+    <!-- 365Scores Script -->
+    <script src="https://widgets.365scores.com/main.js"></script>
 </body>
 </html>
