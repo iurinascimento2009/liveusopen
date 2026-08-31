@@ -78,24 +78,9 @@
             justify-content: center;
         }
 
-        /* Container for the injected HTML */
-        #ts247-widget-container {
+        #score-container {
             width: 100%;
             min-height: 450px;
-            overflow-x: auto;
-        }
-
-        /* Styling to make the injected table look clean */
-        #ts247-widget-container table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        
-        #ts247-widget-container th, #ts247-widget-container td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
         }
 
         .footer {
@@ -117,46 +102,22 @@
 
     <div class="container">
         <div class="widget-wrapper">
-            <div id="ts247-widget-container">
-                <p id="loading-text" style="text-align:center; color:#888; margin-top:100px;">
-                    Fetching live data...
-                </p>
+            <div id="score-container">
+                
+                <!-- ========================================== -->
+                <!-- PASTE 365SCORES WIDGET CODE EXACTLY HERE   -->
+                <!-- ========================================== -->
+                
+                
+
+                <!-- ========================================== -->
             </div>
         </div>
     </div>
 
     <div class="footer">
-        Data provided by TennisStats247. Hosted via GitHub Pages.
+        Data provided by 365Scores. Hosted via GitHub Pages.
     </div>
-
-    <!-- Client-side script to replace the PHP requirement -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // The exact URL from your PHP snippet
-            const targetUrl = 'https://www.tennisstats247.com/TournamentResultsRssWidget.aspx?langId=1&tournamentId=11941&matches=8';
-            
-            // We use a free CORS proxy (allorigins) to allow GitHub Pages to fetch data from another domain
-            const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
-
-            fetch(proxyUrl)
-                .then(response => response.json())
-                .then(data => {
-                    // Parse the XML feed returned by TennisStats247
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-                    
-                    // Extract the HTML table hidden inside the <description> tag
-                    const description = xmlDoc.querySelector("item description").textContent;
-                    
-                    // Inject the table directly into the page
-                    document.getElementById('ts247-widget-container').innerHTML = description;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById('loading-text').innerHTML = 'Live scores are currently unavailable. Please check back later.';
-                });
-        });
-    </script>
 
 </body>
 </html>
